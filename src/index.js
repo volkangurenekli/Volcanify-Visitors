@@ -15,14 +15,20 @@ const App = () => {
   });
 
   useEffect(() => {
-    axios.get("https://609aacc90f5a13001721bad1.mockapi.io/visitors").then(function ({ data }) {
-      setCities(uniqByKeepLast(data, (it) => it.latitude && it.longitude));
+    let cities = [];
+
+    axios.get("/record.json").then(({ data }) => {
+      cities = cities.concat(data);
+      axios.get("https://609aacc90f5a13001721bad1.mockapi.io/visitors").then(({ data }) => {
+        cities = cities.concat(data);
+        setCities(uniqByKeepLast(cities, (it) => it.latitude && it.longitude));
+      });
     });
   }, []);
 
-  function uniqByKeepLast(data, key) {
+  const uniqByKeepLast = (data, key) => {
     return [...new Map(data.map((x) => [key(x), x])).values()];
-  }
+  };
 
   return (
     <MapGL
